@@ -15,9 +15,7 @@ import { ComponentProps, createElement } from 'react';
  * ```
  *
  */
-export function createStyledComponent<T extends React.ComponentType<any>>(
-  component: T
-) {
+export function styled<T extends React.ComponentType<any>>(component: T) {
   type AllProps = ComponentProps<T>;
   type MappedStyleProps = AllProps extends { style?: infer S } ? S : {};
 
