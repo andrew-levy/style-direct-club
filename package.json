@@ -1,6 +1,6 @@
 {
   "name": "style-direct-club",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "test",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -10,20 +10,6 @@
   "files": [
     "src",
     "lib",
-    "android",
-    "ios",
-    "cpp",
-    "*.podspec",
-    "!lib/typescript/example",
-    "!ios/build",
-    "!android/build",
-    "!android/gradle",
-    "!android/gradlew",
-    "!android/gradlew.bat",
-    "!android/local.properties",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__",
     "!**/.*"
   ],
   "scripts": {
