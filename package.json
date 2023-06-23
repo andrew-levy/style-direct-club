@@ -1,6 +1,6 @@
 {
   "name": "style-direct-club",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Apply styles directly to your React Native components via props!",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
