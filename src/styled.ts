@@ -7,13 +7,16 @@ type Options<T extends React.ComponentType<any>> = {
   defaultStyles?: AliasMap<T>;
 };
 
-type AliasMap<T extends React.ComponentType<any>> = ComponentProps<T> extends {
-  style?: infer S;
-}
-  ? S extends StyleProp<infer P>
-    ? Exclude<P, false | null | undefined>
-    : {}
-  : {};
+type AliasMap<T extends React.ComponentType<any>> = Exclude<
+  ComponentProps<T> extends {
+    style?: infer S;
+  }
+    ? S extends StyleProp<infer P>
+      ? Exclude<P, false | null | undefined>
+      : {}
+    : {},
+  (...args: any[]) => any
+>;
 
 /**
  * Creates a styled component, allowing you to pass style props directly to the component
