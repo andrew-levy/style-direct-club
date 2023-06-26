@@ -1,4 +1,6 @@
-export const defaultAlias = {
+import { TextStyle, ViewStyle } from 'react-native';
+
+export const defaultViewStyleAliases: Record<string, keyof ViewStyle> = {
   bg: 'backgroundColor',
   p: 'padding',
   pt: 'paddingTop',
@@ -34,6 +36,21 @@ export const defaultAlias = {
   shrink: 'flexShrink',
 } as const;
 
-//   size: 'fontSize',
-//   weight: 'fontWeight',
-//   align: 'textAlign',
+export const defaultTextStyleAliases: Record<string, keyof TextStyle> = {
+  size: 'fontSize',
+  family: 'fontFamily',
+  weight: 'fontWeight',
+  spacing: 'letterSpacing',
+  lh: 'lineHeight',
+  ta: 'textAlign',
+  tdl: 'textDecorationLine',
+  tds: 'textDecorationStyle',
+  tt: 'textTransform',
+  wd: 'writingDirection',
+  tav: 'textAlignVertical',
+  ifp: 'includeFontPadding',
+  tsc: 'textShadowColor',
+  tso: 'textShadowOffset',
+  tsr: 'textShadowRadius',
+  tdc: 'textDecorationColor',
+} as const;

@@ -3,11 +3,26 @@ import { allowedProps } from './allowedProps';
 import { StyleProp, Text, View } from 'react-native';
 
 type Options<T extends React.ComponentType<any>> = {
-  alias?: Record<string, keyof AliasMap<T>>;
-  defaultStyles?: AliasMap<T>;
+  aliases?: Record<string, keyof StyleObject<T>>;
+  defaultStyles?: StyleObject<T>;
+  customProps?: Record<string, StyleObject<T>>;
 };
 
-type AliasMap<T extends React.ComponentType<any>> = Exclude<
+type AliasedStyles<
+  T extends React.ComponentType<any>,
+  U extends Options<T>
+> = Omit<
+  StyleObject<T>,
+  U['aliases'][keyof U['aliases']] extends string
+    ? U['aliases'][keyof U['aliases']]
+    : never
+> & {
+  [k in keyof U['aliases']]?: StyleObject<T>[U['aliases'][k] extends keyof StyleObject<T>
+    ? U['aliases'][k]
+    : never];
+};
+
+type StyleObject<T extends React.ComponentType<any>> = Exclude<
   ComponentProps<T> extends {
     style?: infer S;
   }
@@ -18,45 +33,80 @@ type AliasMap<T extends React.ComponentType<any>> = Exclude<
   (...args: any[]) => any
 >;
 
+type CustomStyles<
+  T extends React.ComponentType<any>,
+  U extends Options<T>
+> = U['customProps'] extends Record<string, StyleObject<T>>
+  ? {
+      [k in keyof U['customProps']]?: boolean;
+    }
+  : {};
+
+type StyledComponent<
+  T extends React.ComponentType<any>,
+  U extends Options<T>
+> = (
+  props: ComponentProps<T> | AliasedStyles<T, U> | CustomStyles<T, U>
+) => JSX.Element;
+
+type StyledFunction = {
+  <T extends React.ComponentType<any>>(component: T): StyledComponent<T, {}>;
+  <T extends React.ComponentType<any>, U extends Options<T>>(
+    component: T,
+    options: U
+  ): StyledComponent<T, U>;
+  Text: StyledComponent<typeof Text, {}>;
+  View: StyledComponent<typeof View, {}>;
+};
+
 /**
  * Creates a styled component, allowing you to pass style props directly to the component
- * instead of using the `style` prop or `StyleSheet.create`. Prop names can be aliased, and
- * default styles can be provided.
+ * instead of using the `style` prop or `StyleSheet.create`. Provide options to customize
+ * your styling experience.
  */
-export function styled<
-  T extends React.ComponentType<any>,
-  U extends Options<T> = {}
->(component: T, options: U = {} as U) {
-  type BaseProps = ComponentProps<T>;
-  type PropsWithAliasMap = BaseProps &
-    // @ts-ignore
-    Omit<AliasMap<T>, U['alias'][keyof U['alias']]> & {
-      // @ts-ignore
-      [k in keyof U['alias']]?: AliasMap<T>[U['alias'][k]];
-    };
+export const styled: StyledFunction = (
+  component: React.ComponentType<any>,
+  options?: Options<typeof component>
+) => {
+  type BaseProps = ComponentProps<typeof component>;
+  type AliasedProps = AliasedStyles<
+    typeof component,
+    Exclude<typeof options, undefined>
+  >;
+  type CustomProps = CustomStyles<
+    typeof component,
+    Exclude<typeof options, undefined>
+  >;
 
-  return function StyledComponent(props: PropsWithAliasMap) {
+  return function StyledComponent(
+    props: BaseProps | AliasedProps | CustomProps
+  ) {
     return createElement(component, {
       ...props,
       style: {
         ...(options?.defaultStyles || {}),
         ...props.style,
-        ...mapStyleProps(props, options?.alias),
+        ...mapPropsToStyle(props, options?.aliases, options?.customProps),
       },
     });
   };
-}
+};
 
-function mapStyleProps(
+function mapPropsToStyle(
   props: Record<string, any>,
-  aliasMap?: Record<string, any>
+  aliases?: Record<string, any>,
+  customProps?: Record<string, any>
 ) {
-  const styleProps: Record<string, any> = {};
+  let styleProps: Record<string, any> = {};
   if (props) {
     Object.keys(props).forEach((key) => {
-      const keyOrAlias = aliasMap?.[key] || key;
-      if (allowedProps.includes(keyOrAlias)) {
-        styleProps[keyOrAlias] = props[key];
+      if (customProps?.[key]) {
+        styleProps = { ...styleProps, ...customProps[key] };
+      } else {
+        const keyOrAlias = aliases?.[key] || key;
+        if (allowedProps.includes(keyOrAlias)) {
+          styleProps[keyOrAlias] = props[key];
+        }
       }
     });
   }

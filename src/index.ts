@@ -1,2 +1,2 @@
 export { styled } from './styled';
-export { defaultAlias } from './aliases';
+export { defaultTextStyleAliases, defaultViewStyleAliases } from './aliases';
