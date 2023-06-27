@@ -2,7 +2,7 @@
 
 Apply styles directly to your React Native components via props!
 
-- Fully typed
+- Fully type-safe
 - No more `StyleSheet.create()` or `style={{ ... }}`
 - Faster prototyping
 - Custom aliases
@@ -17,7 +17,7 @@ yarn add style-direct-club
 
 ## Usage
 
-The `styled` function takes in a React Native component and returns a styled component. The styled component can be used in place of the original component and will accept style props.
+The `styled` function takes in a component and returns a styled component. A styled component can be used in place of the original and will accept extra style props. Apply styles directly to your components via props!
 
 ```tsx
 import { TouchableOpacity } from 'react-native';
@@ -48,21 +48,18 @@ function App() {
 }
 ```
 
-## Custom Options
+## Options
 
 ### Aliases
 
-Custom aliases allow you to define alternative names for each style prop. This is useful if you want to shorten the names for a more concise syntax. These are fully customizable, so agree upon standards with your team and stay consistent! In the aliases object, the key is the custom name, and the value is the original style prop name.
+Custom aliases allow you to define alternative names for each style prop. This is useful if you want to shorten the names for a more concise syntax. These are fully customizable, so you can agree upon standards with your team and stay consistent! In the aliases object, each key is the custom name, and each value is the original style prop name.
 
 ```tsx
-import { styled, defaultViewStyleAlias } from 'style-direct-club';
+import { styled, defaultViewStyleAliases } from 'style-direct-club';
 import { View } from 'react-native';
 
 const StyledView = styled(View, {
   aliases: {
-    // Use the default aliases
-    ...defaultViewStyleAlias,
-    // Or add your own!
     bg: 'backgroundColor',
     p: 'padding',
     m: 'margin',
@@ -80,9 +77,18 @@ function App() {
 }
 ```
 
+Note: This library comes with a set of default aliases for the built in components. You can import them and use them in your styled components.
+
+```tsx
+import {
+  defaultTextStyleAliases,
+  defaultViewStyleAliases,
+} from 'style-direct-club';
+```
+
 ### Default Styles
 
-You can set common default styles for your components. These styles will be applied to every instance of the component and can be overridden with props.
+Use default styles to set common styles for your components. These styles will be applied to every instance of the component and can be overridden with props.
 
 ```tsx
 import { styled } from 'style-direct-club';
