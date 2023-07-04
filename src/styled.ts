@@ -2,10 +2,18 @@ import { ComponentProps, createElement } from 'react';
 import { allowedProps } from './allowedProps';
 import { StyleProp, Text, View } from 'react-native';
 
+type Prettify<T> = {
+  [k in keyof T]: T[k] extends string | number | boolean | undefined | null
+    ? T[k]
+    : T[k] extends object
+    ? Prettify<T[k]>
+    : never;
+};
+
 type Options<T extends React.ComponentType<any>> = {
   aliases?: Record<string, keyof StyleObject<T>>;
   defaultStyles?: StyleObject<T>;
-  customProps?: Record<string, StyleObject<T>>;
+  customProps?: Prettify<Record<string, StyleObject<T>>>;
 };
 
 type AliasedStyles<
