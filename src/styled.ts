@@ -1,76 +1,26 @@
 import { ComponentProps, createElement } from 'react';
+import {
+  Image,
+  Pressable,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { allowedProps } from './allowedProps';
-import { StyleProp, Text, View } from 'react-native';
-
-type Prettify<T> = {
-  [k in keyof T]: T[k] extends string | number | boolean | undefined | null
-    ? T[k]
-    : T[k] extends object
-    ? Prettify<T[k]>
-    : never;
-};
-
-type Options<T extends React.ComponentType<any>> = {
-  aliases?: Record<string, keyof StyleObject<T>>;
-  defaultStyles?: StyleObject<T>;
-  customProps?: Prettify<Record<string, StyleObject<T>>>;
-};
-
-type AliasedStyles<
-  T extends React.ComponentType<any>,
-  U extends Options<T>
-> = Omit<
-  StyleObject<T>,
-  U['aliases'][keyof U['aliases']] extends string
-    ? U['aliases'][keyof U['aliases']]
-    : never
-> & {
-  [k in keyof U['aliases']]?: StyleObject<T>[U['aliases'][k] extends keyof StyleObject<T>
-    ? U['aliases'][k]
-    : never];
-};
-
-type StyleObject<T extends React.ComponentType<any>> = Exclude<
-  ComponentProps<T> extends {
-    style?: infer S;
-  }
-    ? S extends StyleProp<infer P>
-      ? Exclude<P, false | null | undefined>
-      : {}
-    : {},
-  (...args: any[]) => any
->;
-
-type CustomStyles<
-  T extends React.ComponentType<any>,
-  U extends Options<T>
-> = U['customProps'] extends Record<string, StyleObject<T>>
-  ? {
-      [k in keyof U['customProps']]?: boolean;
-    }
-  : {};
-
-type StyledComponent<
-  T extends React.ComponentType<any>,
-  U extends Options<T>
-> = (
-  props: ComponentProps<T> | AliasedStyles<T, U> | CustomStyles<T, U>
-) => JSX.Element;
-
-type StyledFunction = {
-  <T extends React.ComponentType<any>>(component: T): StyledComponent<T, {}>;
-  <T extends React.ComponentType<any>, U extends Options<T>>(
-    component: T,
-    options: U
-  ): StyledComponent<T, U>;
-  Text: StyledComponent<typeof Text, {}>;
-  View: StyledComponent<typeof View, {}>;
-};
+import type {
+  AliasedStyles,
+  CustomStyles,
+  Options,
+  StyleProps,
+  StyledFunction,
+} from './types';
 
 /**
  * Creates a styled component, allowing you to pass style props directly to the component
  * instead of using the `style` prop or `StyleSheet.create`. Provide options to customize
  * your styling experience.
+ *
  */
 export const styled: StyledFunction = (
   component: React.ComponentType<any>,
@@ -100,19 +50,19 @@ export const styled: StyledFunction = (
   };
 };
 
-function mapPropsToStyle(
-  props: Record<string, any>,
-  aliases?: Record<string, any>,
-  customProps?: Record<string, any>
-) {
-  let styleProps: Record<string, any> = {};
+function mapPropsToStyle<T extends Record<string, any>>(
+  props: T,
+  aliases?: Record<string, keyof StyleProps<T>>,
+  customProps?: Record<string, StyleProps<T>>
+): StyleProps<T> {
+  let styleProps: StyleProps<T> = {};
   if (props) {
     Object.keys(props).forEach((key) => {
       if (customProps?.[key]) {
         styleProps = { ...styleProps, ...customProps[key] };
       } else {
         const keyOrAlias = aliases?.[key] || key;
-        if (allowedProps.includes(keyOrAlias)) {
+        if (allowedProps.includes(keyOrAlias as string)) {
           styleProps[keyOrAlias] = props[key];
         }
       }
@@ -121,5 +71,43 @@ function mapPropsToStyle(
   return styleProps;
 }
 
+// Built-in components
 styled.Text = styled(Text);
 styled.View = styled(View);
+styled.Pressable = styled(Pressable);
+styled.TextInput = styled(TextInput);
+styled.TouchableOpacity = styled(TouchableOpacity);
+styled.Image = styled(Image);
+
+// Add `withOptions` to built-in components
+styled.Text.withOptions = <U extends Options<typeof Text>>(options: U) => {
+  return styled(Text, options);
+};
+
+styled.View.withOptions = <U extends Options<typeof View>>(options: U) => {
+  return styled(View, options);
+};
+
+styled.Pressable.withOptions = <U extends Options<typeof Pressable>>(
+  options: U
+) => {
+  return styled(Pressable, options);
+};
+
+styled.TextInput.withOptions = <U extends Options<typeof TextInput>>(
+  options: U
+) => {
+  return styled(TextInput, options);
+};
+
+styled.TouchableOpacity.withOptions = <
+  U extends Options<typeof TouchableOpacity>
+>(
+  options: U
+) => {
+  return styled(TouchableOpacity, options);
+};
+
+styled.Image.withOptions = <U extends Options<typeof Image>>(options: U) => {
+  return styled(Image, options);
+};

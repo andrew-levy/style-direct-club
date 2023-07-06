@@ -99,4 +99,8 @@ export const allowedProps = [
   'resizeMode',
   'overlayColor',
   'tintColor',
+  'includeFontPadding',
+  'verticalAlign',
+  'textAlignVertical',
+  'backfaceVisibility',
 ];

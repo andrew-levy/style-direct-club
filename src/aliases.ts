@@ -39,6 +39,7 @@ export const defaultViewStyleAliases = {
 } as const;
 
 export const defaultTextStyleAliases = {
+  ...defaultViewStyleAliases,
   size: 'fontSize',
   family: 'fontFamily',
   weight: 'fontWeight',
